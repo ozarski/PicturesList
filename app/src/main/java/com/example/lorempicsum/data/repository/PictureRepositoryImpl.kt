@@ -1,13 +1,14 @@
 package com.example.lorempicsum.data.repository
 
-import com.example.lorempicsum.data.datasource.UnsplashApiInterface
+import com.example.lorempicsum.data.datasource.UnsplashApi
 import com.example.lorempicsum.data.model.UnsplashPicture
 import com.example.lorempicsum.domain.repository.PictureRepository
+import javax.inject.Inject
 
-class PictureRepositoryImpl(
-    private val unsplashApiInterface: UnsplashApiInterface
+class PictureRepositoryImpl @Inject constructor(
+    private val unsplashApi: UnsplashApi
 ): PictureRepository {
     override suspend fun getPictures(page: Int, limit: Int): List<UnsplashPicture> {
-        return unsplashApiInterface.getPictures(page, limit)
+        return unsplashApi.getPictures(page, limit)
     }
 }
