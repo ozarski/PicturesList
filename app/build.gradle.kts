@@ -52,7 +52,11 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation(libs.dagger.hilt)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
     ksp(libs.dagger.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
