@@ -1,38 +1,42 @@
 package com.example.lorempicsum.ui.picturelistscreen
 
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
-import coil3.compose.AsyncImagePainter
 import coil3.compose.SubcomposeAsyncImage
-import com.example.lorempicsum.data.datasource.DEFAULT_PAGE_SIZE
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PictureListScreen(
     navController: NavController,
@@ -40,66 +44,120 @@ fun PictureListScreen(
 ) {
 
     val state = viewModel.state.value
-    val loadedImages = remember { mutableIntStateOf(0) }
 
-    if (state.isLoading) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressIndicator()
+    PullToRefreshBox(
+        isRefreshing = state.isRefreshing,
+        state = rememberPullToRefreshState(),
+        onRefresh = {
+            viewModel.refresh()
         }
-    } else if (state.error.isNotBlank()) {
-        Text(text = state.error)
-    } else {
-        val buffer = 2
-        val listState = rememberLazyStaggeredGridState()
-        val reachedBottom: Boolean by remember {
-            derivedStateOf {
-                val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-                if (lastVisibleItem != null) {
-                    lastVisibleItem.index != 0
-                            && lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - buffer
-                            && loadedImages.intValue >= DEFAULT_PAGE_SIZE
-                } else {
-                    false
+    ) {
+        if (state.isLoading) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (state.error.isNotBlank() && state.pictures.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize().scrollable(state = rememberScrollableState{0f}, orientation = Orientation.Vertical),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = state.error)
+            }
+        } else {
+            val buffer = 4
+            val listState = rememberLazyStaggeredGridState()
+            val reachedBottom: Boolean by remember {
+                derivedStateOf {
+                    val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                    if (lastVisibleItem != null) {
+                        lastVisibleItem.index != 0
+                                && lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - buffer
+                    } else {
+                        false
+                    }
+                }
+            }
+
+            LaunchedEffect(reachedBottom) {
+                if (reachedBottom) {
+                    viewModel.loadMore()
+                }
+            }
+
+
+            Column(
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(5.dp)
+            ) {
+
+                LazyVerticalStaggeredGrid(
+                    columns = StaggeredGridCells.Adaptive(minSize = 150.dp),
+                    verticalItemSpacing = 5.dp,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    state = listState,
+                ) {
+                    items(state.pictures.size) { index ->
+                        val picture = state.pictures[index]
+                        SubcomposeAsyncImage(
+                            model = picture.downloadUrl,
+                            contentDescription = "unsplash picture",
+                            modifier = Modifier.clip(shape = RoundedCornerShape(10.dp)),
+                            loading = {
+                                Column(
+                                    modifier = Modifier.size(
+                                        150.dp
+                                    ),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    CircularProgressIndicator(modifier = Modifier.size(25.dp))
+                                }
+                            },
+                            error = {
+                                Column(
+                                    modifier = Modifier.size(
+                                        150.dp
+                                    ),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(text = "Error loading image")
+                                }
+                            },
+                        )
+                    }
+                    if (state.loadingMore) {
+                        item(span = StaggeredGridItemSpan.FullLine) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    } else if (state.error.isNotBlank()) {
+                        item(span = StaggeredGridItemSpan.FullLine) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth()
+                            ) {
+                                Text(text = state.error, textAlign = TextAlign.Center)
+                            }
+                        }
+                    }
                 }
             }
         }
-
-        LaunchedEffect(reachedBottom) {
-            if (reachedBottom) {
-                viewModel.loadMore()
-            }
-        }
-
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Adaptive(minSize = 150.dp),
-            verticalItemSpacing = 5.dp,
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            state = listState,
-        ) {
-            items(state.pictures.size) { index ->
-                val picture = state.pictures[index]
-                SubcomposeAsyncImage(
-                    model = picture.downloadUrl,
-                    contentDescription = "unsplash picture",
-                    modifier = Modifier.clip(shape = RoundedCornerShape(10.dp)),
-                    loading = {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            CircularProgressIndicator(modifier = Modifier.size(25.dp))
-                        }
-                    },
-                    onSuccess = {
-                        loadedImages.value += 1
-                    }
-                )
-            }
-        }
     }
+
 }

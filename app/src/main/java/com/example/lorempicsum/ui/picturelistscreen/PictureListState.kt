@@ -6,5 +6,7 @@ data class PictureListState(
     val isLoading: Boolean = false,
     val pictures: List<PictureListItem> = emptyList(),
     val error: String = "",
-    val page: Int = 1
+    val page: Int = 1,
+    val loadingMore: Boolean = false,
+    val isRefreshing: Boolean = false
 )
