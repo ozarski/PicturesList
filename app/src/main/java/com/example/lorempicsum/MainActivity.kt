@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -31,24 +32,26 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LoremPicsumTheme {
-                Surface() {
-                    Column(
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        val navController = rememberNavController()
-                        NavHost(
-                            navController = navController,
-                            startDestination = Screen.PictureListScreen.route
+                Scaffold { paddingValues ->
+                    Surface(modifier = Modifier.padding(paddingValues)) {
+                        Column(
+                            verticalArrangement = Arrangement.Top,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            composable(Screen.PictureListScreen.route) {
-                                PictureListScreen(
-                                    navController = navController,
-                                )
-                            }
-                            composable(Screen.PictureDetailScreen.route) {
-                                Text(text = "Detail Screen")
+                            val navController = rememberNavController()
+                            NavHost(
+                                navController = navController,
+                                startDestination = Screen.PictureListScreen.route
+                            ) {
+                                composable(Screen.PictureListScreen.route) {
+                                    PictureListScreen(
+                                        navController = navController,
+                                    )
+                                }
+                                composable(Screen.PictureDetailScreen.route) {
+                                    Text(text = "Detail Screen")
+                                }
                             }
                         }
                     }

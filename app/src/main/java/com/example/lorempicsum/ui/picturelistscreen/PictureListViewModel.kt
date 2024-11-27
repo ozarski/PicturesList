@@ -44,7 +44,6 @@ class PictureListViewModel @Inject constructor(
 
     fun loadMore(){
         _state.value = _state.value.copy(
-            isLoading = true,
             page = _state.value.page + 1
         )
         viewModelScope.launch {
