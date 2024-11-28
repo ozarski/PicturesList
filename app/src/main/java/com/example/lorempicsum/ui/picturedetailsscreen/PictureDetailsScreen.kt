@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.SubcomposeAsyncImage
+import com.example.lorempicsum.ui.base.ErrorScreen
 
 
 @Composable
@@ -48,14 +49,8 @@ fun PictureDetailsScreen(
                 CircularProgressIndicator()
             }
         } else if (state.error.isNotBlank()) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = state.error,
-                )
+            ErrorScreen {
+                viewModel.reload()
             }
         } else {
             Scaffold(
@@ -161,9 +156,11 @@ fun InfoRow(label: String, value: String) {
 @Composable
 fun DownloadUrlRow(url: String, copyOnClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable {
-            copyOnClick()
-        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                copyOnClick()
+            },
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
+import com.example.lorempicsum.ui.base.ErrorScreen
 import com.example.lorempicsum.ui.base.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,13 +63,7 @@ fun PictureListScreen(
                 CircularProgressIndicator()
             }
         } else if (state.error.isNotBlank() && state.pictures.isEmpty()) {
-            Column(
-                modifier = Modifier.fillMaxSize().scrollable(state = rememberScrollableState{0f}, orientation = Orientation.Vertical),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = state.error)
-            }
+            ErrorScreen { viewModel.reload() }
         } else {
             val buffer = 4
             val listState = rememberLazyStaggeredGridState()
