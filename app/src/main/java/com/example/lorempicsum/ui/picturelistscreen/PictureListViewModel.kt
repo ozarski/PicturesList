@@ -89,4 +89,11 @@ class PictureListViewModel @Inject constructor(
             }
         }
     }
+
+    fun reload(){
+        _state.value = _state.value.copy(
+            error = ""
+        )
+        getPictures()
+    }
 }

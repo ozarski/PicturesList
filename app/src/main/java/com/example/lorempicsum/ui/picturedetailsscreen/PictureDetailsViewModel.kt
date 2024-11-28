@@ -1,10 +1,8 @@
 package com.example.lorempicsum.ui.picturedetailsscreen
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.ClipboardManager
 import android.content.Context
-import android.os.Build
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -37,14 +35,15 @@ class PictureDetailsViewModel @Inject constructor(
     private fun getPictureDetails(id: Long) {
         viewModelScope.launch {
             try {
-                _state.value = _state.value.copy(isLoading = true)
+                _state.value = _state.value.copy(isLoading = true, id = id)
                 val picture = pictureRepository.getPictureDetails(id).toPictureDetailsModel()
                 _state.value = _state.value.copy(picture = picture, isLoading = false)
             } catch (e: Exception) {
                 _state.value =
                     _state.value.copy(
                         error = e.message ?: "An unexpected error occurred",
-                        isLoading = false
+                        isLoading = false,
+                        id = id
                     )
             }
         }
@@ -57,6 +56,15 @@ class PictureDetailsViewModel @Inject constructor(
             val clip = android.content.ClipData.newPlainText("Image URL", picture.downloadUrl)
             clipboardManager.setPrimaryClip(clip)
             Toast.makeText(appContext, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun reload() {
+        viewModelScope.launch {
+            _state.value.id?.let { id ->
+                _state.value = _state.value.copy(error = "")
+                getPictureDetails(id)
+            }
         }
     }
 }
