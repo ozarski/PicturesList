@@ -2,26 +2,33 @@ package com.example.lorempicsum.ui.picturedetailsscreen
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lorempicsum.data.model.toPictureDetailsModel
 import com.example.lorempicsum.domain.repository.PictureRepository
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
+import com.example.lorempicsum.ui.base.PICTURE_ID_NAV_PARAM
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = PictureDetailsViewModelFactory::class)
-class PictureDetailsViewModel @AssistedInject constructor(
+@HiltViewModel
+class PictureDetailsViewModel @Inject constructor(
     private val pictureRepository: PictureRepository,
-    @Assisted private val id: Long
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _state = mutableStateOf(PictureDetailsState())
     val state: State<PictureDetailsState> = _state
 
-    private fun getPictureDetails() {
+    init{
+        savedStateHandle.get<String>(PICTURE_ID_NAV_PARAM)?.let { id ->
+            getPictureDetails(id.toLong())
+        }
+    }
+
+    private fun getPictureDetails(id: Long) {
         viewModelScope.launch {
             try {
                 _state.value = _state.value.copy(isLoading = true)
@@ -36,9 +43,4 @@ class PictureDetailsViewModel @AssistedInject constructor(
             }
         }
     }
-}
-
-@AssistedFactory
-interface PictureDetailsViewModelFactory {
-    fun create(id: Long): PictureDetailsViewModel
 }
