@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -107,7 +108,7 @@ fun PictureListScreen(
                         SubcomposeAsyncImage(
                             model = picture.downloadUrl,
                             contentDescription = "unsplash picture",
-                            modifier = Modifier.clip(shape = RoundedCornerShape(10.dp)).clickable {
+                            modifier = Modifier.clip(MaterialTheme.shapes.small).clickable {
                                 navController.navigate(Screen.PictureDetailScreen.route + "/${picture.id}")
                             },
                             loading = {
