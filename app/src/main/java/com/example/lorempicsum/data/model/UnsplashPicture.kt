@@ -1,5 +1,6 @@
 package com.example.lorempicsum.data.model
 
+import com.example.lorempicsum.domain.model.PictureDetailsModel
 import com.example.lorempicsum.domain.model.PictureListItem
 
 data class UnsplashPicture(
@@ -14,9 +15,16 @@ data class UnsplashPicture(
 fun UnsplashPicture.toPictureListItem(): PictureListItem {
     return PictureListItem(
         id = id,
-        authorName = author,
-        width = width,
-        height = height,
         downloadUrl = download_url
+    )
+}
+
+fun UnsplashPicture.toPictureDetailsModel(): PictureDetailsModel {
+    return PictureDetailsModel(
+        id = id,
+        author = author,
+        downloadUrl = download_url,
+        width = width,
+        height = height
     )
 }
