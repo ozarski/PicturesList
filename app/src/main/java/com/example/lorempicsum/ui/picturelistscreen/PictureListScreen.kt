@@ -30,11 +30,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
+import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.base.ErrorScreen
 import com.example.lorempicsum.ui.base.Screen
 
@@ -102,10 +104,12 @@ fun PictureListScreen(
                         val picture = state.pictures[index]
                         SubcomposeAsyncImage(
                             model = picture.downloadUrl,
-                            contentDescription = "unsplash picture",
-                            modifier = Modifier.clip(MaterialTheme.shapes.small).clickable {
-                                navController.navigate(Screen.PictureDetailScreen.route + "/${picture.id}")
-                            },
+                            contentDescription = stringResource(R.string.picture_image_content_description),
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.small)
+                                .clickable {
+                                    navController.navigate(Screen.PictureDetailScreen.route + "/${picture.id}")
+                                },
                             loading = {
                                 Column(
                                     modifier = Modifier.size(
@@ -125,7 +129,7 @@ fun PictureListScreen(
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text(text = "Error loading image")
+                                    Text(text = stringResource(R.string.loading_image_error))
                                 }
                             },
                         )
@@ -147,9 +151,14 @@ fun PictureListScreen(
                             Row(
                                 modifier = Modifier
                                     .padding(16.dp)
-                                    .fillMaxWidth()
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
                             ) {
-                                Text(text = state.error, textAlign = TextAlign.Center)
+                                Text(
+                                    text = stringResource(R.string.loading_next_pictures_error),
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.error
+                                )
                             }
                         }
                     }

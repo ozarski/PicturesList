@@ -22,11 +22,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.SubcomposeAsyncImage
+import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.base.ErrorScreen
 
 
@@ -62,7 +64,10 @@ fun PictureDetailsScreen(
                             .fillMaxWidth(),
                     ) {
                         Text(
-                            text = "Picture ID: ${state.picture?.id}",
+                            text = stringResource(
+                                id = R.string.details_picture_id,
+                                state.picture?.id ?: ""
+                            ),
                             style = MaterialTheme.typography.headlineMedium,
                             modifier = Modifier.padding(16.dp)
                         )
@@ -98,7 +103,7 @@ fun PictureDetailsScreen(
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text(text = "Error loading image")
+                                Text(text = stringResource(id = R.string.loading_image_error))
                             }
                         },
                     )
@@ -118,13 +123,17 @@ fun PictureDetailsScreen(
                             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                         )
                         Spacer(modifier = Modifier.size(16.dp))
-                        InfoRow("Author", state.picture?.author ?: "author unknown")
+                        InfoRow(stringResource(id = R.string.picture_author_label), state.picture?.author ?: stringResource(id = R.string.unknown_value))
                         Spacer(modifier = Modifier.size(8.dp))
-                        InfoRow("Width", state.picture?.width.toString())
+                        InfoRow(stringResource(id = R.string.picture_width_label), if(state.picture?.width != null) {
+                            state.picture.width.toString()
+                        } else stringResource(id = R.string.unknown_value))
                         Spacer(modifier = Modifier.size(8.dp))
-                        InfoRow("Height", state.picture?.height.toString())
+                        InfoRow(stringResource(id = R.string.picture_height_label), if(state.picture?.height != null) {
+                            state.picture.height.toString()
+                        } else stringResource(id = R.string.unknown_value))
                         Spacer(modifier = Modifier.size(8.dp))
-                        DownloadUrlRow(state.picture?.downloadUrl ?: "no download url") {
+                        DownloadUrlRow(state.picture?.downloadUrl ?: stringResource(id = R.string.no_download_url)) {
                             viewModel.copyUrlToClipboard()
                         }
                     }
@@ -164,7 +173,7 @@ fun DownloadUrlRow(url: String, copyOnClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Download URL",
+            text = stringResource(id = R.string.picture_download_url_label),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             style = MaterialTheme.typography.bodyLarge
         )

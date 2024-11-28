@@ -1,11 +1,12 @@
 package com.example.lorempicsum.ui.picturelistscreen
 
+import android.content.res.Resources
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lorempicsum.R
 import com.example.lorempicsum.data.model.toPictureListItem
-import com.example.lorempicsum.domain.model.PictureListItem
 import com.example.lorempicsum.domain.repository.PictureRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -37,7 +38,7 @@ class PictureListViewModel @Inject constructor(
             } catch (e: Exception){
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = e.message ?: "An unexpected error occurred"
+                    error = e.message ?: Resources.getSystem().getString(R.string.error_message)
                 )
             }
         }
@@ -59,7 +60,7 @@ class PictureListViewModel @Inject constructor(
             } catch (e: Exception){
                 _state.value = _state.value.copy(
                     loadingMore = false,
-                    error = e.message ?: "An unexpected error occurred"
+                    error = e.message ?: Resources.getSystem().getString(R.string.error_message),
                 )
             }
         }
@@ -83,7 +84,7 @@ class PictureListViewModel @Inject constructor(
                 delay(100)
                 _state.value = _state.value.copy(
                     isRefreshing = false,
-                    error = e.message ?: "An unexpected error occurred",
+                    error = e.message ?: Resources.getSystem().getString(R.string.error_message),
                     pictures = emptyList()
                 )
             }

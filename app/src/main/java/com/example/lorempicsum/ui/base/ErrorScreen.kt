@@ -17,7 +17,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.lorempicsum.R
 
 @Composable
 fun ErrorScreen(onRetryClick: () -> Unit) {
@@ -28,18 +30,18 @@ fun ErrorScreen(onRetryClick: () -> Unit) {
     ) {
         Icon(
             imageVector = Icons.Default.Clear,
-            contentDescription = "Error",
+            contentDescription = stringResource(R.string.error_icon_content_description),
             tint = MaterialTheme.colorScheme.error,
             modifier = Modifier.size(48.dp)
         )
         Spacer(modifier = Modifier.size(8.dp))
-        Text(text = "Something went wrong", style = MaterialTheme.typography.headlineSmall)
+        Text(text = stringResource(R.string.error_message), style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.size(8.dp))
         Button(onClick = onRetryClick) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "Retry", style = MaterialTheme.typography.labelLarge)
+                Text(text = stringResource(R.string.retry_button_label), style = MaterialTheme.typography.labelLarge)
                 Spacer(modifier = Modifier.size(8.dp))
-                Icon(imageVector = Icons.Outlined.Refresh, contentDescription = "Retry")
+                Icon(imageVector = Icons.Outlined.Refresh, contentDescription = stringResource(R.string.retry_button_label))
             }
         }
     }
