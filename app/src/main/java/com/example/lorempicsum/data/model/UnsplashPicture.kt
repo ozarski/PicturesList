@@ -6,7 +6,7 @@ data class UnsplashPicture(
     val author: String,
     val download_url: String,
     val height: Int,
-    val id: String,
+    val id: Long,
     val url: String,
     val width: Int
 )
