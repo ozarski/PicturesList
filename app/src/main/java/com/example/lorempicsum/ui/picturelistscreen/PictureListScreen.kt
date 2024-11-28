@@ -1,5 +1,6 @@
 package com.example.lorempicsum.ui.picturelistscreen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -14,13 +15,12 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
+import com.example.lorempicsum.ui.base.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +108,9 @@ fun PictureListScreen(
                         SubcomposeAsyncImage(
                             model = picture.downloadUrl,
                             contentDescription = "unsplash picture",
-                            modifier = Modifier.clip(shape = RoundedCornerShape(10.dp)),
+                            modifier = Modifier.clip(MaterialTheme.shapes.small).clickable {
+                                navController.navigate(Screen.PictureDetailScreen.route + "/${picture.id}")
+                            },
                             loading = {
                                 Column(
                                     modifier = Modifier.size(

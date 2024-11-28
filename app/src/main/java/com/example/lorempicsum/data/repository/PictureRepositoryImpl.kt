@@ -11,4 +11,8 @@ class PictureRepositoryImpl @Inject constructor(
     override suspend fun getPictures(page: Int, limit: Int): List<UnsplashPicture> {
         return unsplashApi.getPictures(page, limit)
     }
+
+    override suspend fun getPictureDetails(id: Long): UnsplashPicture {
+        return unsplashApi.getPictureDetails(id)
+    }
 }

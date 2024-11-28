@@ -1,4 +1,4 @@
-package com.example.lorempicsum.ui
+package com.example.lorempicsum.ui.base
 
 sealed class Screen(val route: String) {
     data object PictureListScreen : Screen("picture_list_screen")
