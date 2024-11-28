@@ -19,6 +19,7 @@
     <!-- Picture list -->
     <string name="picture_image_content_description">Unsplash picture</string>
     <string name="loading_next_pictures_error">Something went wrong while loading pictures</string>
+    <string name="picture_list_item_picture_id_label">Picture ID</string>
 
     <!-- Error screen -->
     <string name="retry_button_label">Retry</string>

@@ -1,9 +1,7 @@
 package com.example.lorempicsum.ui.picturelistscreen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +13,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -102,37 +99,55 @@ fun PictureListScreen(
                 ) {
                     items(state.pictures.size) { index ->
                         val picture = state.pictures[index]
-                        SubcomposeAsyncImage(
-                            model = picture.downloadUrl,
-                            contentDescription = stringResource(R.string.picture_image_content_description),
+                        Column (
                             modifier = Modifier
                                 .clip(MaterialTheme.shapes.small)
-                                .clickable {
-                                    navController.navigate(Screen.PictureDetailScreen.route + "/${picture.id}")
+                                .background(MaterialTheme.colorScheme.surfaceBright),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            SubcomposeAsyncImage(
+                                model = picture.downloadUrl,
+                                contentDescription = stringResource(R.string.picture_image_content_description),
+                                modifier = Modifier
+                                    .clip(MaterialTheme.shapes.small)
+                                    .clickable {
+                                        navController.navigate(Screen.PictureDetailScreen.route + "/${picture.id}")
+                                    },
+                                loading = {
+                                    Column(
+                                        modifier = Modifier.size(
+                                            150.dp
+                                        ),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        CircularProgressIndicator(modifier = Modifier.size(25.dp))
+                                    }
                                 },
-                            loading = {
-                                Column(
-                                    modifier = Modifier.size(
-                                        150.dp
-                                    ),
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    CircularProgressIndicator(modifier = Modifier.size(25.dp))
-                                }
-                            },
-                            error = {
-                                Column(
-                                    modifier = Modifier.size(
-                                        150.dp
-                                    ),
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(text = stringResource(R.string.loading_image_error))
-                                }
-                            },
-                        )
+                                error = {
+                                    Column(
+                                        modifier = Modifier.size(
+                                            150.dp
+                                        ),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(text = stringResource(R.string.loading_image_error))
+                                    }
+                                },
+                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(5.dp)
+                            ){
+                                Text(stringResource(R.string.picture_list_item_picture_id_label))
+                                Text(picture.id.toString())
+                            }
+                        }
                     }
                     if (state.loadingMore) {
                         item(span = StaggeredGridItemSpan.FullLine) {
