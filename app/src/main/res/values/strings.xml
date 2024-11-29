@@ -5,7 +5,7 @@
     <string name="loading_image_error">Error loading image</string>
 
     <!-- Picture details -->
-    <string name="details_picture_id">Picture ID: %d</string>
+    <string name="details_picture_id">Picture ID: %s</string>
     <string name="picture_details_label">Picture Details</string>
     <string name="picture_author_label">Author</string>
     <string name="picture_width_label">Width</string>

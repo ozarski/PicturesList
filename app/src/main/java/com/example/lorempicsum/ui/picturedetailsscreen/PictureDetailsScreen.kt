@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,9 +26,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil3.compose.SubcomposeAsyncImage
 import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.base.ErrorScreen
+import com.example.lorempicsum.ui.base.LoadingScreen
+import com.example.lorempicsum.ui.base.Picture
 import com.example.lorempicsum.ui.theme.dimens
 
 
@@ -44,123 +44,93 @@ fun PictureDetailsScreen(
     Surface(
         color = MaterialTheme.colorScheme.background
     ) {
-        if (state.isLoading) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (state.error.isNotBlank()) {
-            ErrorScreen {
-                viewModel.reload()
-            }
-        } else {
-            Scaffold(
-                topBar = {
-                    Row(
-                        modifier = Modifier
-                            .clip(
-                                RoundedCornerShape(
-                                    bottomStart = MaterialTheme.dimens.cornerRadiusMedium,
-                                    bottomEnd = MaterialTheme.dimens.cornerRadiusMedium
-                                )
-                            )
-                            .background(color = MaterialTheme.colorScheme.primaryContainer)
-                            .fillMaxWidth(),
-                    ) {
-                        Text(
-                            text = stringResource(
-                                id = R.string.details_picture_id,
-                                state.picture?.id ?: ""
-                            ),
-                            style = MaterialTheme.typography.headlineMedium,
-                            modifier = Modifier.padding(MaterialTheme.dimens.paddingMedium)
-                        )
-                    }
+        DetailsContainer(
+            pictureID = if (state.id != null) {
+                state.id.toString()
+            } else stringResource(
+                id = R.string.unknown_value
+            )
+        ) {
+            if (state.isLoading) {
+                LoadingScreen()
+            } else if (state.error.isNotBlank()) {
+                ErrorScreen {
+                    viewModel.reload()
                 }
-            ) { paddingValues ->
+            } else {
+                Picture(
+                    pictureMaxHeight = pictureMaxHeight,
+                    url = state.picture?.downloadUrl ?: ""
+                )
+                Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerExtraLarge))
+                HorizontalDivider(
+                    thickness = MaterialTheme.dimens.dividerThickness,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerLarge))
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(
-                            horizontal = MaterialTheme.dimens.paddingMedium,
-                            vertical = MaterialTheme.dimens.paddingExtraLarge
-                        ),
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    SubcomposeAsyncImage(
-                        modifier = Modifier
-                            .sizeIn(maxHeight = pictureMaxHeight)
-                            .clip(MaterialTheme.shapes.small),
-                        model = state.picture?.downloadUrl ?: "",
-                        contentDescription = state.picture?.author ?: "",
-                        loading = {
-                            Column(
-                                modifier = Modifier.size(MaterialTheme.dimens.imageNotLoadedSize),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                CircularProgressIndicator()
-                            }
-                        },
-                        error = {
-                            Column(
-                                modifier = Modifier.size(MaterialTheme.dimens.imageNotLoadedSize),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(text = stringResource(id = R.string.loading_image_error))
-                            }
-                        },
+                    Text(
+                        stringResource(id = R.string.picture_details_label),
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                     )
-                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerExtraLarge))
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerMedium))
+                    InfoRow(
+                        stringResource(id = R.string.picture_author_label),
+                        state.picture?.author ?: stringResource(id = R.string.unknown_value)
                     )
-                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerLarge))
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.Start
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
+                    InfoRow(
+                        stringResource(id = R.string.picture_width_label),
+                        if (state.picture?.width != null) {
+                            state.picture.width.toString()
+                        } else stringResource(id = R.string.unknown_value)
+                    )
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
+                    InfoRow(
+                        stringResource(id = R.string.picture_height_label),
+                        if (state.picture?.height != null) {
+                            state.picture.height.toString()
+                        } else stringResource(id = R.string.unknown_value)
+                    )
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
+                    DownloadUrlRow(
+                        state.picture?.downloadUrl
+                            ?: stringResource(id = R.string.no_download_url)
                     ) {
-                        Text(
-                            "Picture Details",
-                            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerMedium))
-                        InfoRow(
-                            stringResource(id = R.string.picture_author_label),
-                            state.picture?.author ?: stringResource(id = R.string.unknown_value)
-                        )
-                        Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
-                        InfoRow(
-                            stringResource(id = R.string.picture_width_label),
-                            if (state.picture?.width != null) {
-                                state.picture.width.toString()
-                            } else stringResource(id = R.string.unknown_value)
-                        )
-                        Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
-                        InfoRow(
-                            stringResource(id = R.string.picture_height_label),
-                            if (state.picture?.height != null) {
-                                state.picture.height.toString()
-                            } else stringResource(id = R.string.unknown_value)
-                        )
-                        Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
-                        DownloadUrlRow(
-                            state.picture?.downloadUrl
-                                ?: stringResource(id = R.string.no_download_url)
-                        ) {
-                            viewModel.copyUrlToClipboard()
-                        }
+                        viewModel.copyUrlToClipboard()
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun DetailsContainer(pictureID: String, content: @Composable () -> Unit) {
+
+    Scaffold(
+        topBar = {
+            DetailsTopBar(
+                pictureID
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(
+                    horizontal = MaterialTheme.dimens.paddingMedium,
+                    vertical = MaterialTheme.dimens.paddingExtraLarge
+                ),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            content()
         }
     }
 }
@@ -206,6 +176,30 @@ fun DownloadUrlRow(url: String, copyOnClick: () -> Unit) {
             modifier = Modifier.sizeIn(maxWidth = 200.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+fun DetailsTopBar(id: String) {
+    Row(
+        modifier = Modifier
+            .clip(
+                RoundedCornerShape(
+                    bottomStart = MaterialTheme.dimens.cornerRadiusMedium,
+                    bottomEnd = MaterialTheme.dimens.cornerRadiusMedium
+                )
+            )
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
+            .fillMaxWidth(),
+    ) {
+        Text(
+            text = stringResource(
+                id = R.string.details_picture_id,
+                id
+            ),
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(MaterialTheme.dimens.paddingMedium)
         )
     }
 }

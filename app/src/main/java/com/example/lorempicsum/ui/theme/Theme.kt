@@ -56,7 +56,9 @@ data class AppDimens(
     val iconMedium: Dp = 32.dp,
     val iconLarge: Dp = 48.dp,
 
-    val imageNotLoadedSize: Dp = 150.dp
+    val imageNotLoadedSize: Dp = 150.dp,
+
+    val dividerThickness: Dp = 1.dp
 )
 
 val LocalAppDimens = staticCompositionLocalOf<AppDimens> {
