@@ -7,7 +7,6 @@ import android.content.res.Resources
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -44,7 +43,8 @@ class PictureDetailsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _state.value =
                     _state.value.copy(
-                        error = e.message ?: Resources.getSystem().getString(R.string.error_message),
+                        error = e.message ?: Resources.getSystem()
+                            .getString(R.string.error_message),
                         isLoading = false,
                         id = id
                     )
@@ -56,9 +56,15 @@ class PictureDetailsViewModel @Inject constructor(
         _state.value.picture?.let { picture ->
             val clipboardManager =
                 appContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = android.content.ClipData.newPlainText(Resources.getSystem().getString(R.string.url_clipboard_label), picture.downloadUrl)
+            val clip = android.content.ClipData.newPlainText(
+                Resources.getSystem().getString(R.string.url_clipboard_label), picture.downloadUrl
+            )
             clipboardManager.setPrimaryClip(clip)
-            Toast.makeText(appContext, Resources.getSystem().getString(R.string.url_copied), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                appContext,
+                Resources.getSystem().getString(R.string.url_copied),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

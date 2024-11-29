@@ -1,6 +1,6 @@
 package com.example.lorempicsum.ui.base
 
 sealed class Screen(val route: String) {
-    data object PictureListScreen : Screen("picture_list_screen")
-    data object PictureDetailScreen : Screen("picture_detail_screen")
+    data object PictureListScreen : Screen(PICTURE_LIST_SCREEN_ROUTE)
+    data object PictureDetailScreen : Screen(PICTURE_DETAILS_SCREEN_ROUTE)
 }

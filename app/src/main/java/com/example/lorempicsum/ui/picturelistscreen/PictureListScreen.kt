@@ -36,6 +36,7 @@ import coil3.compose.SubcomposeAsyncImage
 import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.base.ErrorScreen
 import com.example.lorempicsum.ui.base.Screen
+import com.example.lorempicsum.ui.theme.dimens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,6 +46,7 @@ fun PictureListScreen(
 ) {
 
     val state = viewModel.state.value
+    val gridCellSize = 150.dp
 
     PullToRefreshBox(
         isRefreshing = state.isRefreshing,
@@ -66,6 +68,7 @@ fun PictureListScreen(
         } else {
             val buffer = 4
             val listState = rememberLazyStaggeredGridState()
+
             val reachedBottom: Boolean by remember {
                 derivedStateOf {
                     val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
@@ -88,18 +91,18 @@ fun PictureListScreen(
             Column(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(5.dp)
+                modifier = Modifier.padding(MaterialTheme.dimens.paddingSmall)
             ) {
 
                 LazyVerticalStaggeredGrid(
-                    columns = StaggeredGridCells.Adaptive(minSize = 150.dp),
-                    verticalItemSpacing = 5.dp,
-                    horizontalArrangement = Arrangement.spacedBy(5.dp),
+                    columns = StaggeredGridCells.Adaptive(gridCellSize),
+                    verticalItemSpacing = MaterialTheme.dimens.paddingExtraSmall,
+                    horizontalArrangement = Arrangement.spacedBy(MaterialTheme.dimens.paddingExtraSmall),
                     state = listState,
                 ) {
                     items(state.pictures.size) { index ->
                         val picture = state.pictures[index]
-                        Column (
+                        Column(
                             modifier = Modifier
                                 .clip(MaterialTheme.shapes.small)
                                 .background(MaterialTheme.colorScheme.surfaceBright),
@@ -117,18 +120,18 @@ fun PictureListScreen(
                                 loading = {
                                     Column(
                                         modifier = Modifier.size(
-                                            150.dp
+                                            MaterialTheme.dimens.imageNotLoadedSize
                                         ),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        CircularProgressIndicator(modifier = Modifier.size(25.dp))
+                                        CircularProgressIndicator()
                                     }
                                 },
                                 error = {
                                     Column(
                                         modifier = Modifier.size(
-                                            150.dp
+                                            MaterialTheme.dimens.imageNotLoadedSize
                                         ),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
@@ -142,8 +145,8 @@ fun PictureListScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(5.dp)
-                            ){
+                                    .padding(MaterialTheme.dimens.paddingExtraSmall)
+                            ) {
                                 Text(stringResource(R.string.picture_list_item_picture_id_label))
                                 Text(picture.id.toString())
                             }
@@ -153,7 +156,7 @@ fun PictureListScreen(
                         item(span = StaggeredGridItemSpan.FullLine) {
                             Row(
                                 modifier = Modifier
-                                    .padding(16.dp)
+                                    .padding(MaterialTheme.dimens.paddingMedium)
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
@@ -165,7 +168,7 @@ fun PictureListScreen(
                         item(span = StaggeredGridItemSpan.FullLine) {
                             Row(
                                 modifier = Modifier
-                                    .padding(16.dp)
+                                    .padding(MaterialTheme.dimens.paddingMedium)
                                     .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center,
                             ) {
@@ -181,5 +184,4 @@ fun PictureListScreen(
             }
         }
     }
-
 }

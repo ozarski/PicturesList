@@ -2,8 +2,6 @@ package com.example.lorempicsum.di
 
 import com.example.lorempicsum.data.datasource.UNSPLASH_BASE_URL
 import com.example.lorempicsum.data.datasource.UnsplashApi
-import com.example.lorempicsum.data.repository.PictureRepositoryImpl
-import com.example.lorempicsum.domain.repository.PictureRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -30,6 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.SubcomposeAsyncImage
 import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.base.ErrorScreen
+import com.example.lorempicsum.ui.theme.dimens
 
 
 @Composable
@@ -38,6 +39,7 @@ fun PictureDetailsScreen(
 ) {
 
     val state = viewModel.state.value
+    val pictureMaxHeight = 500.dp
 
     Surface(
         color = MaterialTheme.colorScheme.background
@@ -59,7 +61,12 @@ fun PictureDetailsScreen(
                 topBar = {
                     Row(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp))
+                            .clip(
+                                RoundedCornerShape(
+                                    bottomStart = MaterialTheme.dimens.cornerRadiusMedium,
+                                    bottomEnd = MaterialTheme.dimens.cornerRadiusMedium
+                                )
+                            )
                             .background(color = MaterialTheme.colorScheme.primaryContainer)
                             .fillMaxWidth(),
                     ) {
@@ -69,7 +76,7 @@ fun PictureDetailsScreen(
                                 state.picture?.id ?: ""
                             ),
                             style = MaterialTheme.typography.headlineMedium,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(MaterialTheme.dimens.paddingMedium)
                         )
                     }
                 }
@@ -78,28 +85,31 @@ fun PictureDetailsScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .padding(horizontal = 16.dp, vertical = 32.dp),
+                        .padding(
+                            horizontal = MaterialTheme.dimens.paddingMedium,
+                            vertical = MaterialTheme.dimens.paddingExtraLarge
+                        ),
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     SubcomposeAsyncImage(
                         modifier = Modifier
-                            .sizeIn(maxHeight = 500.dp)
+                            .sizeIn(maxHeight = pictureMaxHeight)
                             .clip(MaterialTheme.shapes.small),
                         model = state.picture?.downloadUrl ?: "",
                         contentDescription = state.picture?.author ?: "",
                         loading = {
                             Column(
-                                modifier = Modifier.size(250.dp),
+                                modifier = Modifier.size(MaterialTheme.dimens.imageNotLoadedSize),
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                CircularProgressIndicator(modifier = Modifier.size(25.dp))
+                                CircularProgressIndicator()
                             }
                         },
                         error = {
                             Column(
-                                modifier = Modifier.size(250.dp),
+                                modifier = Modifier.size(MaterialTheme.dimens.imageNotLoadedSize),
                                 verticalArrangement = Arrangement.Center,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
@@ -107,12 +117,12 @@ fun PictureDetailsScreen(
                             }
                         },
                     )
-                    Spacer(modifier = Modifier.size(32.dp))
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerExtraLarge))
                     HorizontalDivider(
                         thickness = 1.dp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Spacer(modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerLarge))
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Top,
@@ -122,18 +132,30 @@ fun PictureDetailsScreen(
                             "Picture Details",
                             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                         )
-                        Spacer(modifier = Modifier.size(16.dp))
-                        InfoRow(stringResource(id = R.string.picture_author_label), state.picture?.author ?: stringResource(id = R.string.unknown_value))
-                        Spacer(modifier = Modifier.size(8.dp))
-                        InfoRow(stringResource(id = R.string.picture_width_label), if(state.picture?.width != null) {
-                            state.picture.width.toString()
-                        } else stringResource(id = R.string.unknown_value))
-                        Spacer(modifier = Modifier.size(8.dp))
-                        InfoRow(stringResource(id = R.string.picture_height_label), if(state.picture?.height != null) {
-                            state.picture.height.toString()
-                        } else stringResource(id = R.string.unknown_value))
-                        Spacer(modifier = Modifier.size(8.dp))
-                        DownloadUrlRow(state.picture?.downloadUrl ?: stringResource(id = R.string.no_download_url)) {
+                        Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerMedium))
+                        InfoRow(
+                            stringResource(id = R.string.picture_author_label),
+                            state.picture?.author ?: stringResource(id = R.string.unknown_value)
+                        )
+                        Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
+                        InfoRow(
+                            stringResource(id = R.string.picture_width_label),
+                            if (state.picture?.width != null) {
+                                state.picture.width.toString()
+                            } else stringResource(id = R.string.unknown_value)
+                        )
+                        Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
+                        InfoRow(
+                            stringResource(id = R.string.picture_height_label),
+                            if (state.picture?.height != null) {
+                                state.picture.height.toString()
+                            } else stringResource(id = R.string.unknown_value)
+                        )
+                        Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
+                        DownloadUrlRow(
+                            state.picture?.downloadUrl
+                                ?: stringResource(id = R.string.no_download_url)
+                        ) {
                             viewModel.copyUrlToClipboard()
                         }
                     }
