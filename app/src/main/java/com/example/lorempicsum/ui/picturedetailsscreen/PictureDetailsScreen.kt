@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,12 +21,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil3.compose.SubcomposeAsyncImage
+import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.base.ErrorScreen
+import com.example.lorempicsum.ui.base.LoadingScreen
+import com.example.lorempicsum.ui.base.Picture
+import com.example.lorempicsum.ui.theme.dimens
 
 
 @Composable
@@ -36,100 +39,98 @@ fun PictureDetailsScreen(
 ) {
 
     val state = viewModel.state.value
+    val pictureMaxHeight = 500.dp
 
     Surface(
         color = MaterialTheme.colorScheme.background
     ) {
-        if (state.isLoading) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if (state.error.isNotBlank()) {
-            ErrorScreen {
-                viewModel.reload()
-            }
-        } else {
-            Scaffold(
-                topBar = {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp))
-                            .background(color = MaterialTheme.colorScheme.primaryContainer)
-                            .fillMaxWidth(),
-                    ) {
-                        Text(
-                            text = "Picture ID: ${state.picture?.id}",
-                            style = MaterialTheme.typography.headlineMedium,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
+        DetailsContainer(
+            pictureID = if (state.id != null) {
+                state.id.toString()
+            } else stringResource(
+                id = R.string.unknown_value
+            )
+        ) {
+            if (state.isLoading) {
+                LoadingScreen()
+            } else if (state.error.isNotBlank()) {
+                ErrorScreen {
+                    viewModel.reload()
                 }
-            ) { paddingValues ->
+            } else {
+                Picture(
+                    pictureMaxHeight = pictureMaxHeight,
+                    url = state.picture?.downloadUrl ?: ""
+                )
+                Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerExtraLarge))
+                HorizontalDivider(
+                    thickness = MaterialTheme.dimens.dividerThickness,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerLarge))
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .padding(horizontal = 16.dp, vertical = 32.dp),
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    SubcomposeAsyncImage(
-                        modifier = Modifier
-                            .sizeIn(maxHeight = 500.dp)
-                            .clip(MaterialTheme.shapes.small),
-                        model = state.picture?.downloadUrl ?: "",
-                        contentDescription = state.picture?.author ?: "",
-                        loading = {
-                            Column(
-                                modifier = Modifier.size(250.dp),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                CircularProgressIndicator(modifier = Modifier.size(25.dp))
-                            }
-                        },
-                        error = {
-                            Column(
-                                modifier = Modifier.size(250.dp),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(text = "Error loading image")
-                            }
-                        },
+                    Text(
+                        stringResource(id = R.string.picture_details_label),
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                     )
-                    Spacer(modifier = Modifier.size(32.dp))
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerMedium))
+                    InfoRow(
+                        stringResource(id = R.string.picture_author_label),
+                        state.picture?.author ?: stringResource(id = R.string.unknown_value)
                     )
-                    Spacer(modifier = Modifier.size(24.dp))
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.Start
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
+                    InfoRow(
+                        stringResource(id = R.string.picture_width_label),
+                        if (state.picture?.width != null) {
+                            state.picture.width.toString()
+                        } else stringResource(id = R.string.unknown_value)
+                    )
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
+                    InfoRow(
+                        stringResource(id = R.string.picture_height_label),
+                        if (state.picture?.height != null) {
+                            state.picture.height.toString()
+                        } else stringResource(id = R.string.unknown_value)
+                    )
+                    Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
+                    DownloadUrlRow(
+                        state.picture?.downloadUrl
+                            ?: stringResource(id = R.string.no_download_url)
                     ) {
-                        Text(
-                            "Picture Details",
-                            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-                        )
-                        Spacer(modifier = Modifier.size(16.dp))
-                        InfoRow("Author", state.picture?.author ?: "author unknown")
-                        Spacer(modifier = Modifier.size(8.dp))
-                        InfoRow("Width", state.picture?.width.toString())
-                        Spacer(modifier = Modifier.size(8.dp))
-                        InfoRow("Height", state.picture?.height.toString())
-                        Spacer(modifier = Modifier.size(8.dp))
-                        DownloadUrlRow(state.picture?.downloadUrl ?: "no download url") {
-                            viewModel.copyUrlToClipboard()
-                        }
+                        viewModel.copyUrlToClipboard()
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun DetailsContainer(pictureID: String, content: @Composable () -> Unit) {
+
+    Scaffold(
+        topBar = {
+            DetailsTopBar(
+                pictureID
+            )
+        }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(
+                    horizontal = MaterialTheme.dimens.paddingMedium,
+                    vertical = MaterialTheme.dimens.paddingExtraLarge
+                ),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            content()
         }
     }
 }
@@ -164,7 +165,7 @@ fun DownloadUrlRow(url: String, copyOnClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Download URL",
+            text = stringResource(id = R.string.picture_download_url_label),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             style = MaterialTheme.typography.bodyLarge
         )
@@ -175,6 +176,30 @@ fun DownloadUrlRow(url: String, copyOnClick: () -> Unit) {
             modifier = Modifier.sizeIn(maxWidth = 200.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+fun DetailsTopBar(id: String) {
+    Row(
+        modifier = Modifier
+            .clip(
+                RoundedCornerShape(
+                    bottomStart = MaterialTheme.dimens.cornerRadiusMedium,
+                    bottomEnd = MaterialTheme.dimens.cornerRadiusMedium
+                )
+            )
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
+            .fillMaxWidth(),
+    ) {
+        Text(
+            text = stringResource(
+                id = R.string.details_picture_id,
+                id
+            ),
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(MaterialTheme.dimens.paddingMedium)
         )
     }
 }

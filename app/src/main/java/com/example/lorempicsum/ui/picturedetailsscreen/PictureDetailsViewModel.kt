@@ -3,12 +3,14 @@ package com.example.lorempicsum.ui.picturedetailsscreen
 import android.app.Application
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.res.Resources
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lorempicsum.R
 import com.example.lorempicsum.data.model.toPictureDetailsModel
 import com.example.lorempicsum.domain.repository.PictureRepository
 import com.example.lorempicsum.ui.base.PICTURE_ID_NAV_PARAM
@@ -41,7 +43,8 @@ class PictureDetailsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _state.value =
                     _state.value.copy(
-                        error = e.message ?: "An unexpected error occurred",
+                        error = e.message ?: Resources.getSystem()
+                            .getString(R.string.error_message),
                         isLoading = false,
                         id = id
                     )
@@ -53,9 +56,15 @@ class PictureDetailsViewModel @Inject constructor(
         _state.value.picture?.let { picture ->
             val clipboardManager =
                 appContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Image URL", picture.downloadUrl)
+            val clip = android.content.ClipData.newPlainText(
+                Resources.getSystem().getString(R.string.url_clipboard_label), picture.downloadUrl
+            )
             clipboardManager.setPrimaryClip(clip)
-            Toast.makeText(appContext, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                appContext,
+                Resources.getSystem().getString(R.string.url_copied),
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

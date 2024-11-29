@@ -13,7 +13,7 @@ interface UnsplashApi {
         @Query(LIMIT_QUERY_PARAM) limit: Int
     ): List<UnsplashPicture>
 
-    @GET(PICTURE_DETAILS_ENDPOINS)
+    @GET(PICTURE_DETAILS_ENDPOINT)
     suspend fun getPictureDetails(
         @Path(ID_PATH_PARAM) id: Long
     ): UnsplashPicture
