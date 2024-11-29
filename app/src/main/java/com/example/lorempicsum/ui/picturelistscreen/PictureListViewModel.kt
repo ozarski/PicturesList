@@ -61,6 +61,7 @@ class PictureListViewModel @Inject constructor(
                 _state.value = _state.value.copy(
                     loadingMore = false,
                     error = e.message ?: Resources.getSystem().getString(R.string.error_message),
+                    page = _state.value.page - 1
                 )
             }
         }

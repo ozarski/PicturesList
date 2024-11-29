@@ -18,7 +18,7 @@ import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.theme.dimens
 
 @Composable
-fun Picture(pictureMaxHeight: Dp, url: String){
+fun Picture(pictureMaxHeight: Dp = MaterialTheme.dimens.imageDefaultMaxSize, url: String) {
     SubcomposeAsyncImage(
         modifier = Modifier
             .sizeIn(maxHeight = pictureMaxHeight)

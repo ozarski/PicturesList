@@ -39,18 +39,6 @@ fun ErrorScreen(onRetryClick: () -> Unit) {
             style = MaterialTheme.typography.headlineSmall
         )
         Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
-        Button(onClick = onRetryClick) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(R.string.retry_button_label),
-                    style = MaterialTheme.typography.labelLarge
-                )
-                Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
-                Icon(
-                    imageVector = Icons.Outlined.Refresh,
-                    contentDescription = stringResource(R.string.retry_button_label)
-                )
-            }
-        }
+        RetryButton(onRetryClick = onRetryClick)
     }
 }

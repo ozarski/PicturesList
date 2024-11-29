@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LoremPicsum</string>
     <!-- General -->
-    <string name="error_message">An error occurred</string>
+    <string name="error_message">Something went wrong</string>
     <string name="loading_image_error">Error loading image</string>
 
     <!-- Picture details -->

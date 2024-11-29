@@ -35,6 +35,9 @@ import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.base.ErrorScreen
+import com.example.lorempicsum.ui.base.LoadingScreen
+import com.example.lorempicsum.ui.base.Picture
+import com.example.lorempicsum.ui.base.RetryButton
 import com.example.lorempicsum.ui.base.Screen
 import com.example.lorempicsum.ui.theme.dimens
 
@@ -56,43 +59,37 @@ fun PictureListScreen(
         }
     ) {
         if (state.isLoading) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                CircularProgressIndicator()
-            }
+            LoadingScreen()
         } else if (state.error.isNotBlank() && state.pictures.isEmpty()) {
             ErrorScreen { viewModel.reload() }
         } else {
-            val buffer = 4
-            val listState = rememberLazyStaggeredGridState()
-
-            val reachedBottom: Boolean by remember {
-                derivedStateOf {
-                    val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
-                    if (lastVisibleItem != null) {
-                        lastVisibleItem.index != 0
-                                && lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - buffer
-                    } else {
-                        false
-                    }
-                }
-            }
-
-            LaunchedEffect(reachedBottom) {
-                if (reachedBottom) {
-                    viewModel.loadMore()
-                }
-            }
-
 
             Column(
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(MaterialTheme.dimens.paddingSmall)
             ) {
+
+                val buffer = 4
+                val listState = rememberLazyStaggeredGridState()
+
+                val reachedBottom: Boolean by remember {
+                    derivedStateOf {
+                        val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+                        if (lastVisibleItem != null) {
+                            lastVisibleItem.index != 0
+                                    && lastVisibleItem.index >= listState.layoutInfo.totalItemsCount - buffer
+                        } else {
+                            false
+                        }
+                    }
+                }
+
+                LaunchedEffect(reachedBottom) {
+                    if (reachedBottom) {
+                        viewModel.loadMore()
+                    }
+                }
 
                 LazyVerticalStaggeredGrid(
                     columns = StaggeredGridCells.Adaptive(gridCellSize),
@@ -102,86 +99,54 @@ fun PictureListScreen(
                 ) {
                     items(state.pictures.size) { index ->
                         val picture = state.pictures[index]
-                        Column(
-                            modifier = Modifier
-                                .clip(MaterialTheme.shapes.small)
-                                .background(MaterialTheme.colorScheme.surfaceBright),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            SubcomposeAsyncImage(
-                                model = picture.downloadUrl,
-                                contentDescription = stringResource(R.string.picture_image_content_description),
-                                modifier = Modifier
-                                    .clip(MaterialTheme.shapes.small)
-                                    .clickable {
-                                        navController.navigate(Screen.PictureDetailScreen.route + "/${picture.id}")
-                                    },
-                                loading = {
-                                    Column(
-                                        modifier = Modifier.size(
-                                            MaterialTheme.dimens.imageNotLoadedSize
-                                        ),
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        CircularProgressIndicator()
-                                    }
-                                },
-                                error = {
-                                    Column(
-                                        modifier = Modifier.size(
-                                            MaterialTheme.dimens.imageNotLoadedSize
-                                        ),
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Text(text = stringResource(R.string.loading_image_error))
-                                    }
-                                },
-                            )
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(MaterialTheme.dimens.paddingExtraSmall)
-                            ) {
-                                Text(stringResource(R.string.picture_list_item_picture_id_label))
-                                Text(picture.id.toString())
-                            }
-                        }
+                        ListItem(picture, navController)
                     }
                     if (state.loadingMore) {
                         item(span = StaggeredGridItemSpan.FullLine) {
-                            Row(
-                                modifier = Modifier
-                                    .padding(MaterialTheme.dimens.paddingMedium)
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                CircularProgressIndicator()
-                            }
+                            LoadingMoreAppend()
                         }
                     } else if (state.error.isNotBlank()) {
                         item(span = StaggeredGridItemSpan.FullLine) {
-                            Row(
-                                modifier = Modifier
-                                    .padding(MaterialTheme.dimens.paddingMedium)
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.loading_next_pictures_error),
-                                    textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.error
-                                )
+                            ErrorAppend{
+                                viewModel.loadMore()
                             }
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun LoadingMoreAppend(){
+    Row(
+        modifier = Modifier
+            .padding(MaterialTheme.dimens.paddingMedium)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun ErrorAppend(onRetry: () -> Unit){
+    Column(
+        modifier = Modifier
+            .padding(MaterialTheme.dimens.paddingMedium)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Text(
+            text = stringResource(R.string.loading_next_pictures_error),
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.error
+        )
+        RetryButton {
+            onRetry()
         }
     }
 }

@@ -57,6 +57,7 @@ data class AppDimens(
     val iconLarge: Dp = 48.dp,
 
     val imageNotLoadedSize: Dp = 150.dp,
+    val imageDefaultMaxSize: Dp = 500.dp,
 
     val dividerThickness: Dp = 1.dp
 )
