@@ -12,15 +12,19 @@ import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.exceptions.base.MockitoException
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.given
 import org.mockito.kotlin.whenever
+import java.net.SocketTimeoutException
 
 @RunWith(MockitoJUnitRunner::class)
 class PictureDetailsViewModelTests {
@@ -34,12 +38,17 @@ class PictureDetailsViewModelTests {
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Test
     fun `test init load`() = runTest {
         val savedStateHandle = SavedStateHandle().apply {
             set(PICTURE_ID_NAV_PARAM, "1")
         }
-
 
         val mock = mockDetails()
         whenever(pictureRepository.getPictureDetails(1)).thenReturn(mock)
@@ -61,7 +70,6 @@ class PictureDetailsViewModelTests {
         val savedStateHandle = SavedStateHandle().apply {
             set(PICTURE_ID_NAV_PARAM, "1")
         }
-
 
         val mock = mockDetails()
         whenever(pictureRepository.getPictureDetails(1)).thenReturn(mock)
@@ -93,9 +101,7 @@ class PictureDetailsViewModelTests {
             set(PICTURE_ID_NAV_PARAM, "1")
         }
 
-
-        val mock = mockDetails()
-        whenever(pictureRepository.getPictureDetails(1)).thenThrow(MockitoException("error message"))
+        given(pictureRepository.getPictureDetails(1)).willAnswer { throw SocketTimeoutException("error message") }
 
         val pictureDetailsViewModel =
             PictureDetailsViewModel(pictureRepository, savedStateHandle, Application())
@@ -111,7 +117,6 @@ class PictureDetailsViewModelTests {
             set(PICTURE_ID_NAV_PARAM, "1")
         }
 
-
         val mock = mockDetails()
 
         whenever(pictureRepository.getPictureDetails(1)).thenReturn(mock)
@@ -126,8 +131,7 @@ class PictureDetailsViewModelTests {
         assertEquals(mock.height, pictureDetailsViewModel.state.value.picture!!.height)
         assertEquals(mock.id, pictureDetailsViewModel.state.value.picture!!.id)
 
-
-        whenever(pictureRepository.getPictureDetails(1)).thenThrow(MockitoException("error message"))
+        given(pictureRepository.getPictureDetails(1)).willAnswer { throw SocketTimeoutException("error message") }
 
         pictureDetailsViewModel.reload()
 

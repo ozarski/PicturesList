@@ -17,7 +17,9 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.exceptions.base.MockitoException
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.given
 import org.mockito.kotlin.whenever
+import java.net.SocketTimeoutException
 
 @RunWith(MockitoJUnitRunner::class)
 class PictureListViewModelTests {
@@ -95,7 +97,7 @@ class PictureListViewModelTests {
 
     @Test
     fun `test init with error`() = runTest {
-        whenever(pictureRepository.getPictures(1)).thenThrow(MockitoException("error"))
+        given(pictureRepository.getPictures(1)).willAnswer{ throw SocketTimeoutException("error") }
 
         val pictureListViewModel = PictureListViewModel(pictureRepository)
 
@@ -105,7 +107,7 @@ class PictureListViewModelTests {
     @Test
     fun `test loadMore with error`() = runTest {
         whenever(pictureRepository.getPictures(1)).thenReturn(mockData())
-        whenever(pictureRepository.getPictures(2)).thenThrow(MockitoException("error"))
+        given(pictureRepository.getPictures(2)).willAnswer{ throw SocketTimeoutException("error") }
 
         val pictureListViewModel = PictureListViewModel(pictureRepository)
 
@@ -116,7 +118,7 @@ class PictureListViewModelTests {
 
     @Test
     fun `test refresh with error`() = runTest {
-        whenever(pictureRepository.getPictures(1)).thenThrow(MockitoException("error"))
+        given(pictureRepository.getPictures(1)).willAnswer{ throw SocketTimeoutException("error") }
 
         val pictureListViewModel = PictureListViewModel(pictureRepository)
 
@@ -127,7 +129,7 @@ class PictureListViewModelTests {
 
     @Test
     fun `test reload with error`() = runTest {
-        whenever(pictureRepository.getPictures(1)).thenThrow(MockitoException("error"))
+        given(pictureRepository.getPictures(1)).willAnswer{ throw SocketTimeoutException("error") }
 
         val pictureListViewModel = PictureListViewModel(pictureRepository)
 
