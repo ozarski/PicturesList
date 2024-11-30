@@ -105,7 +105,7 @@ class PictureDetailsViewModelTests {
         val pictureDetailsViewModel =
             PictureDetailsViewModel(pictureRepository, savedStateHandle, Application())
 
-        assertEquals("error message", pictureDetailsViewModel.state.value.error)
+        assert(pictureDetailsViewModel.state.value.error is SocketTimeoutException)
         assertNull(pictureDetailsViewModel.state.value.picture)
     }
 
@@ -134,7 +134,7 @@ class PictureDetailsViewModelTests {
 
         pictureDetailsViewModel.reload()
 
-        assertEquals("error message", pictureDetailsViewModel.state.value.error)
+        assert(pictureDetailsViewModel.state.value.error is SocketTimeoutException)
         assertNull(pictureDetailsViewModel.state.value.picture)
     }
 

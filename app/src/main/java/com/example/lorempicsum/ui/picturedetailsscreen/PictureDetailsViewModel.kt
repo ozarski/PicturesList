@@ -15,9 +15,6 @@ import com.example.lorempicsum.domain.repository.PictureRepository
 import com.example.lorempicsum.ui.base.PICTURE_ID_NAV_PARAM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.net.SocketTimeoutException
-import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,41 +39,11 @@ class PictureDetailsViewModel @Inject constructor(
                 _state.value = _state.value.copy(isLoading = true, id = id)
                 val picture = pictureRepository.getPictureDetails(id).toPictureDetailsModel()
                 _state.value = _state.value.copy(picture = picture, isLoading = false)
-            } catch (e: HttpException) {
-                _state.value =
-                    _state.value.copy(
-                        error = appContext
-                            .getString(R.string.http_error_message),
-                        isLoading = false,
-                        id = id,
-                        picture = null
-                    )
             }
-            catch (e: SocketTimeoutException){
+            catch (e: Exception){
                 _state.value =
                     _state.value.copy(
-                        error = appContext
-                            .getString(R.string.no_connection_error_message),
-                        isLoading = false,
-                        id = id,
-                        picture = null
-                    )
-            }
-            catch (e: UnknownHostException){
-                _state.value =
-                    _state.value.copy(
-                        error = appContext
-                            .getString(R.string.no_connection_error_message),
-                        isLoading = false,
-                        id = id,
-                        picture = null
-                    )
-            }
-            catch (e: Exception) {
-                _state.value =
-                    _state.value.copy(
-                        error = appContext
-                            .getString(R.string.base_error_message),
+                        error = e,
                         isLoading = false,
                         id = id,
                         picture = null
@@ -104,7 +71,7 @@ class PictureDetailsViewModel @Inject constructor(
     fun reload() {
         viewModelScope.launch {
             _state.value.id?.let { id ->
-                _state.value = _state.value.copy(error = "")
+                _state.value = _state.value.copy(error = null)
                 getPictureDetails(id)
             }
         }

@@ -52,7 +52,7 @@ fun PictureListScreen(
     ) {
         if (state.isLoading) {
             LoadingScreen()
-        } else if (state.error.isNotBlank() && state.pictures.isEmpty()) {
+        } else if (state.error != null && state.pictures.isEmpty()) {
             ErrorScreen(state.error) { viewModel.reload() }
         } else {
 
@@ -97,7 +97,7 @@ fun PictureListScreen(
                         item(span = StaggeredGridItemSpan.FullLine) {
                             LoadingMoreAppend()
                         }
-                    } else if (state.error.isNotBlank()) {
+                    } else if (state.error != null) {
                         item(span = StaggeredGridItemSpan.FullLine) {
                             ErrorAppend{
                                 viewModel.loadMore()

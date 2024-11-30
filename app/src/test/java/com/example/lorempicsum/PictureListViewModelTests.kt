@@ -1,5 +1,6 @@
 package com.example.lorempicsum
 
+import android.app.Application
 import com.example.lorempicsum.data.model.UnsplashPicture
 import com.example.lorempicsum.domain.repository.PictureRepository
 import com.example.lorempicsum.ui.picturelistscreen.PictureListViewModel
@@ -100,7 +101,7 @@ class PictureListViewModelTests {
 
         val pictureListViewModel = PictureListViewModel(pictureRepository)
 
-        assertEquals(pictureListViewModel.state.value.error, "error")
+        assert(pictureListViewModel.state.value.error is SocketTimeoutException)
     }
 
     @Test
@@ -112,7 +113,7 @@ class PictureListViewModelTests {
 
         pictureListViewModel.loadMore()
 
-        assertEquals(pictureListViewModel.state.value.error, "error")
+        assert(pictureListViewModel.state.value.error is SocketTimeoutException)
     }
 
     @Test
@@ -123,7 +124,7 @@ class PictureListViewModelTests {
 
         pictureListViewModel.refresh()
 
-        assertEquals(pictureListViewModel.state.value.error, "error")
+        assert(pictureListViewModel.state.value.error is SocketTimeoutException)
     }
 
     @Test
@@ -134,7 +135,7 @@ class PictureListViewModelTests {
 
         pictureListViewModel.reload()
 
-        assertEquals(pictureListViewModel.state.value.error, "error")
+        assert(pictureListViewModel.state.value.error is SocketTimeoutException)
     }
 
 
