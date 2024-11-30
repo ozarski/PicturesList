@@ -3,7 +3,6 @@ package com.example.lorempicsum.ui.picturedetailsscreen
 import android.app.Application
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.res.Resources
 import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +15,9 @@ import com.example.lorempicsum.domain.repository.PictureRepository
 import com.example.lorempicsum.ui.base.PICTURE_ID_NAV_PARAM
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,11 +42,41 @@ class PictureDetailsViewModel @Inject constructor(
                 _state.value = _state.value.copy(isLoading = true, id = id)
                 val picture = pictureRepository.getPictureDetails(id).toPictureDetailsModel()
                 _state.value = _state.value.copy(picture = picture, isLoading = false)
-            } catch (e: Exception) {
+            } catch (e: HttpException) {
                 _state.value =
                     _state.value.copy(
-                        error = e.message ?: Resources.getSystem()
-                            .getString(R.string.error_message),
+                        error = appContext
+                            .getString(R.string.http_error_message),
+                        isLoading = false,
+                        id = id,
+                        picture = null
+                    )
+            }
+            catch (e: SocketTimeoutException){
+                _state.value =
+                    _state.value.copy(
+                        error = appContext
+                            .getString(R.string.no_connection_error_message),
+                        isLoading = false,
+                        id = id,
+                        picture = null
+                    )
+            }
+            catch (e: UnknownHostException){
+                _state.value =
+                    _state.value.copy(
+                        error = appContext
+                            .getString(R.string.no_connection_error_message),
+                        isLoading = false,
+                        id = id,
+                        picture = null
+                    )
+            }
+            catch (e: Exception) {
+                _state.value =
+                    _state.value.copy(
+                        error = appContext
+                            .getString(R.string.base_error_message),
                         isLoading = false,
                         id = id,
                         picture = null
@@ -58,12 +90,12 @@ class PictureDetailsViewModel @Inject constructor(
             val clipboardManager =
                 appContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = android.content.ClipData.newPlainText(
-                Resources.getSystem().getString(R.string.url_clipboard_label), picture.downloadUrl
+                appContext.getString(R.string.url_clipboard_label), picture.downloadUrl
             )
             clipboardManager.setPrimaryClip(clip)
             Toast.makeText(
                 appContext,
-                Resources.getSystem().getString(R.string.url_copied),
+                appContext.getString(R.string.url_copied),
                 Toast.LENGTH_SHORT
             ).show()
         }

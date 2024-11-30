@@ -1,14 +1,10 @@
 package com.example.lorempicsum.ui.picturelistscreen
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
@@ -26,19 +22,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil3.compose.SubcomposeAsyncImage
 import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.base.ErrorScreen
 import com.example.lorempicsum.ui.base.LoadingScreen
-import com.example.lorempicsum.ui.base.Picture
 import com.example.lorempicsum.ui.base.RetryButton
-import com.example.lorempicsum.ui.base.Screen
 import com.example.lorempicsum.ui.theme.dimens
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +53,7 @@ fun PictureListScreen(
         if (state.isLoading) {
             LoadingScreen()
         } else if (state.error.isNotBlank() && state.pictures.isEmpty()) {
-            ErrorScreen { viewModel.reload() }
+            ErrorScreen(state.error) { viewModel.reload() }
         } else {
 
             Column(
