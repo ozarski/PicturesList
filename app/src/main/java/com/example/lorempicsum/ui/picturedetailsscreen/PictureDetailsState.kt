@@ -4,7 +4,7 @@ import com.example.lorempicsum.domain.model.PictureDetailsModel
 
 data class PictureDetailsState (
     val picture: PictureDetailsModel? = null,
-    val error: String = "",
+    val error: Exception? = null,
     val isLoading: Boolean = false,
     val id: Long? = null
 )

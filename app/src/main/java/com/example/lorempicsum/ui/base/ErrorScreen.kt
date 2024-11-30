@@ -19,10 +19,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.lorempicsum.R
 import com.example.lorempicsum.ui.theme.dimens
+import retrofit2.HttpException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 @Composable
-fun ErrorScreen(message: String, onRetryClick: () -> Unit) {
+fun ErrorScreen(errorType: Exception, onRetryClick: () -> Unit) {
     val textWidth = 400.dp
+
+    val text = when (errorType) {
+        is UnknownHostException, is SocketTimeoutException -> {
+            stringResource(R.string.no_connection_error_message)
+        }
+
+        is HttpException -> {
+            stringResource(R.string.http_error_message)
+        }
+
+        else -> {
+            stringResource(R.string.base_error_message)
+        }
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -37,7 +54,7 @@ fun ErrorScreen(message: String, onRetryClick: () -> Unit) {
         )
         Spacer(modifier = Modifier.size(MaterialTheme.dimens.spacerSmall))
         Text(
-            text = message,
+            text = text,
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier.sizeIn(maxWidth = textWidth)

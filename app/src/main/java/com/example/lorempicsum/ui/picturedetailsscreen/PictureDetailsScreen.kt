@@ -53,7 +53,7 @@ fun PictureDetailsScreen(
         ) {
             if (state.isLoading) {
                 LoadingScreen()
-            } else if (state.error.isNotBlank()) {
+            } else if (state.error != null) {
                 ErrorScreen(state.error) {
                     viewModel.reload()
                 }
