@@ -1,6 +1,6 @@
 package com.example.lorempicsum.ui.picturelistscreen
 
-import android.content.res.Resources
+import android.app.Application
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -11,11 +11,15 @@ import com.example.lorempicsum.domain.repository.PictureRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
 class PictureListViewModel @Inject constructor(
-    private val pictureRepository: PictureRepository
+    private val pictureRepository: PictureRepository,
+    private val appContext: Application
 ) : ViewModel(){
 
     private val _state = mutableStateOf(PictureListState())
@@ -35,10 +39,28 @@ class PictureListViewModel @Inject constructor(
                     isLoading = false,
                     pictures = pictures
                 )
-            } catch (e: Exception){
+            } catch (e: HttpException){
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = e.message ?: Resources.getSystem().getString(R.string.error_message)
+                    error = appContext.getString(R.string.http_error_message)
+                )
+            }
+            catch (e: SocketTimeoutException){
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = appContext.getString(R.string.no_connection_error_message)
+                )
+            }
+            catch (e: UnknownHostException){
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = appContext.getString(R.string.no_connection_error_message)
+                )
+            }
+            catch (e: Exception){
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = appContext.getString(R.string.base_error_message)
                 )
             }
         }
@@ -57,10 +79,28 @@ class PictureListViewModel @Inject constructor(
                     loadingMore = false,
                     pictures = _state.value.pictures + newPictures
                 )
+            } catch (e: HttpException){
+                _state.value = _state.value.copy(
+                    loadingMore = false,
+                    error = appContext.getString(R.string.http_error_message),
+                    page = _state.value.page - 1
+                )
+            } catch (e: SocketTimeoutException){
+                _state.value = _state.value.copy(
+                    loadingMore = false,
+                    error = appContext.getString(R.string.no_connection_error_message),
+                    page = _state.value.page - 1
+                )
+            } catch (e: UnknownHostException){
+                _state.value = _state.value.copy(
+                    loadingMore = false,
+                    error = appContext.getString(R.string.no_connection_error_message),
+                    page = _state.value.page - 1
+                )
             } catch (e: Exception){
                 _state.value = _state.value.copy(
                     loadingMore = false,
-                    error = e.message ?: Resources.getSystem().getString(R.string.error_message),
+                    error = appContext.getString(R.string.base_error_message),
                     page = _state.value.page - 1
                 )
             }
@@ -81,11 +121,32 @@ class PictureListViewModel @Inject constructor(
                     pictures = pictures,
                     error = ""
                 )
+            } catch (e: HttpException){
+                delay(100)
+                _state.value = _state.value.copy(
+                    isRefreshing = false,
+                    error = appContext.getString(R.string.http_error_message),
+                    pictures = emptyList()
+                )
+            } catch (e: SocketTimeoutException){
+                delay(100)
+                _state.value = _state.value.copy(
+                    isRefreshing = false,
+                    error = appContext.getString(R.string.no_connection_error_message),
+                    pictures = emptyList()
+                )
+            } catch (e: UnknownHostException){
+                delay(100)
+                _state.value = _state.value.copy(
+                    isRefreshing = false,
+                    error = appContext.getString(R.string.no_connection_error_message),
+                    pictures = emptyList()
+                )
             } catch (e: Exception){
                 delay(100)
                 _state.value = _state.value.copy(
                     isRefreshing = false,
-                    error = e.message ?: Resources.getSystem().getString(R.string.error_message),
+                    error = appContext.getString(R.string.base_error_message),
                     pictures = emptyList()
                 )
             }

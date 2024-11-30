@@ -13,7 +13,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.given
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.net.SocketTimeoutException
 

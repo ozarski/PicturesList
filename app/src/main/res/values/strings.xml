@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">LoremPicsum</string>
     <!-- General -->
-    <string name="error_message">Something went wrong</string>
+    <string name="base_error_message">Something went wrong</string>
+    <string name="no_connection_error_message">Unable to connect. Please check your internet connection.</string>
+    <string name="http_error_message">Server error. Please try again later.</string>
     <string name="loading_image_error">Error loading image</string>
 
     <!-- Picture details -->
