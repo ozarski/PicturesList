@@ -46,7 +46,8 @@ class PictureDetailsViewModel @Inject constructor(
                         error = e.message ?: Resources.getSystem()
                             .getString(R.string.error_message),
                         isLoading = false,
-                        id = id
+                        id = id,
+                        picture = null
                     )
             }
         }

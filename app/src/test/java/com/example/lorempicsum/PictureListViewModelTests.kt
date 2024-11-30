@@ -1,15 +1,16 @@
 package com.example.lorempicsum
 
 import com.example.lorempicsum.data.model.UnsplashPicture
-import com.example.lorempicsum.data.model.toPictureListItem
 import com.example.lorempicsum.domain.repository.PictureRepository
 import com.example.lorempicsum.ui.picturelistscreen.PictureListViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,23 +27,32 @@ class PictureListViewModelTests {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
-    fun setUp(){
+    fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Test
-    fun `test getPictures() default` () = runTest {
+    fun `test getPictures() default`() = runTest {
         val mockData = mockData()
 
         whenever(pictureRepository.getPictures(1)).thenReturn(mockData)
 
-        val freshPictureListViewModel = PictureListViewModel(pictureRepository)
-        assertEquals(freshPictureListViewModel.state.value.pictures, mockData.map { it.toPictureListItem() })
-
+        val pictureListViewModel = PictureListViewModel(pictureRepository)
+        assertEquals(mockData.size, pictureListViewModel.state.value.pictures.size)
+        mockData.forEachIndexed { index, picture ->
+            assert(picture.id == pictureListViewModel.state.value.pictures[index].id)
+            assert(picture.download_url == pictureListViewModel.state.value.pictures[index].downloadUrl)
+        }
     }
 
     @Test
-    fun `test loadMore() page 2`() = runTest{
+    fun `test loadMore() page 2`() = runTest {
 
         whenever(pictureRepository.getPictures(1)).thenReturn(mockData(0))
         whenever(pictureRepository.getPictures(2)).thenReturn(mockData(1))
@@ -51,28 +61,40 @@ class PictureListViewModelTests {
 
         pictureListViewModel.loadMore()
         val combinedMockData = mockData(0) + mockData(1)
-        assertEquals(pictureListViewModel.state.value.pictures, combinedMockData.map { it.toPictureListItem() })
+        assertEquals(pictureListViewModel.state.value.pictures.size, combinedMockData.size)
+        combinedMockData.forEachIndexed { index, picture ->
+            assert(picture.id == pictureListViewModel.state.value.pictures[index].id)
+            assert(picture.download_url == pictureListViewModel.state.value.pictures[index].downloadUrl)
+        }
     }
 
     @Test
-    fun `test refresh() and reload()`() = runTest{
+    fun `test refresh() and reload()`() = runTest {
         val mockData = mockData()
         whenever(pictureRepository.getPictures(1)).thenReturn(mockData)
 
         val pictureListViewModel = PictureListViewModel(pictureRepository)
         pictureListViewModel.refresh()
 
-        assertEquals(pictureListViewModel.state.value.pictures, mockData.map { it.toPictureListItem() })
+        assertEquals(mockData.size, pictureListViewModel.state.value.pictures.size)
+        mockData.forEachIndexed { index, picture ->
+            assert(picture.id == pictureListViewModel.state.value.pictures[index].id)
+            assert(picture.download_url == pictureListViewModel.state.value.pictures[index].downloadUrl)
+        }
         assert(!pictureListViewModel.state.value.isRefreshing)
 
         pictureListViewModel.reload()
 
-        assertEquals(pictureListViewModel.state.value.pictures, mockData.map { it.toPictureListItem() })
+        assertEquals(mockData.size, pictureListViewModel.state.value.pictures.size)
+        mockData.forEachIndexed { index, picture ->
+            assert(picture.id == pictureListViewModel.state.value.pictures[index].id)
+            assert(picture.download_url == pictureListViewModel.state.value.pictures[index].downloadUrl)
+        }
         assert(!pictureListViewModel.state.value.isLoading)
     }
 
     @Test
-    fun `test init with error`() = runTest{
+    fun `test init with error`() = runTest {
         whenever(pictureRepository.getPictures(1)).thenThrow(MockitoException("error"))
 
         val pictureListViewModel = PictureListViewModel(pictureRepository)
@@ -81,7 +103,7 @@ class PictureListViewModelTests {
     }
 
     @Test
-    fun `test loadMore with error`() = runTest{
+    fun `test loadMore with error`() = runTest {
         whenever(pictureRepository.getPictures(1)).thenReturn(mockData())
         whenever(pictureRepository.getPictures(2)).thenThrow(MockitoException("error"))
 
@@ -93,7 +115,7 @@ class PictureListViewModelTests {
     }
 
     @Test
-    fun `test refresh with error`() = runTest{
+    fun `test refresh with error`() = runTest {
         whenever(pictureRepository.getPictures(1)).thenThrow(MockitoException("error"))
 
         val pictureListViewModel = PictureListViewModel(pictureRepository)
@@ -104,7 +126,7 @@ class PictureListViewModelTests {
     }
 
     @Test
-    fun `test reload with error`() = runTest{
+    fun `test reload with error`() = runTest {
         whenever(pictureRepository.getPictures(1)).thenThrow(MockitoException("error"))
 
         val pictureListViewModel = PictureListViewModel(pictureRepository)
@@ -115,8 +137,8 @@ class PictureListViewModelTests {
     }
 
 
-    private fun mockData(page: Int = 0): List<UnsplashPicture>{
-        return List(20){
+    private fun mockData(page: Int = 0): List<UnsplashPicture> {
+        return List(20) {
             UnsplashPicture(
                 id = it.toLong() + page * 20,
                 download_url = "downloadUrl/${it + page * 20}",
