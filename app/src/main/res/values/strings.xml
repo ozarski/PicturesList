@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">LoremPicsum</string>
+    <!-- General -->
+    <string name="base_error_message">Something went wrong</string>
+    <string name="no_connection_error_message">Unable to connect. Please check your internet connection.</string>
+    <string name="http_error_message">Server error. Please try again later.</string>
+    <string name="loading_image_error">Error loading image</string>
+
+    <!-- Picture details -->
+    <string name="details_picture_id">Picture ID: %s</string>
+    <string name="picture_details_label">Picture Details</string>
+    <string name="picture_author_label">Author</string>
+    <string name="picture_width_label">Width</string>
+    <string name="picture_height_label">Height</string>
+    <string name="picture_download_url_label">Download URL</string>
+    <string name="no_download_url">No download URL</string>
+    <string name="unknown_value">Unknown</string>
+    <string name="url_copied">URL copied to clipboard!</string>
+    <string name="url_clipboard_label">Image URL</string>
+
+    <!-- Picture list -->
+    <string name="picture_image_content_description">Unsplash picture</string>
+    <string name="loading_next_pictures_error">Something went wrong while loading pictures</string>
+    <string name="picture_list_item_picture_id_label">Picture ID</string>
+
+    <!-- Error screen -->
+    <string name="retry_button_label">Retry</string>
+    <string name="error_icon_content_description">Error</string>
 </resources>
