@@ -31,7 +31,7 @@ fun Picture(pictureMaxHeight: Dp = MaterialTheme.dimens.imageDefaultMaxSize, url
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimaryContainer)
             }
         },
         error = {

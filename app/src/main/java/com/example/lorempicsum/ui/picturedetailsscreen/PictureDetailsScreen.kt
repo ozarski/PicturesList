@@ -117,7 +117,8 @@ fun DetailsContainer(pictureID: String, content: @Composable () -> Unit) {
             DetailsTopBar(
                 pictureID
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -186,8 +187,8 @@ fun DetailsTopBar(id: String) {
         modifier = Modifier
             .clip(
                 RoundedCornerShape(
-                    bottomStart = MaterialTheme.dimens.cornerRadiusMedium,
-                    bottomEnd = MaterialTheme.dimens.cornerRadiusMedium
+                    bottomStart = MaterialTheme.dimens.cornerRadiusLarge,
+                    bottomEnd = MaterialTheme.dimens.cornerRadiusLarge
                 )
             )
             .background(color = MaterialTheme.colorScheme.primaryContainer)
@@ -198,6 +199,7 @@ fun DetailsTopBar(id: String) {
                 id = R.string.details_picture_id,
                 id
             ),
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(MaterialTheme.dimens.paddingMedium)
         )
